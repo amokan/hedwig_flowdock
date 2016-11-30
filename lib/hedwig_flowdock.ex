@@ -25,9 +25,10 @@ defmodule Hedwig.Adapters.Flowdock do
     {:ok, s_conn} = SC.start_link(Keyword.put(opts, :flows, flows))
     users = GenServer.call(r_conn, :users)
     reduced_users = reduce(users, %{})
-    user = Enum.find(users, fn u -> String.downcase(u["nick"]) == String.downcase(opts[:name]) end) |> to_string
+    user = Enum.find(users, fn u -> String.downcase(u["nick"]) == String.downcase(opts[:name]) end)
+    user_id = user["id"] |> to_string
 
-    {:ok, %State{conn: s_conn, rest_conn: r_conn, opts: opts, robot: robot, users: reduced_users, user_id: user["id"]}}
+    {:ok, %State{conn: s_conn, rest_conn: r_conn, opts: opts, robot: robot, users: reduced_users, user_id: user_id}}
   end
 
   def handle_cast({:send, msg}, %{rest_conn: r_conn} = state) do
