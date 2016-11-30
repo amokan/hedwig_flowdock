@@ -56,6 +56,10 @@ defmodule Hedwig.Adapters.Flowdock do
     {:noreply, state}
   end
 
+  # the bot should ignore its own messages
+  def handle_cast({:message, _content, _flow_id, user_id, _thread_id}, %{user_id: ^user_id} = state) do
+    {:noreply, state}
+  end
   def handle_cast({:message, content, flow_id, user, thread_id}, %{robot: robot, users: users} = state) do
     msg = %Hedwig.Message{
       ref: make_ref(),
@@ -72,12 +76,7 @@ defmodule Hedwig.Adapters.Flowdock do
       }
     }
 
-    Logger.info("msg: " <> inspect(msg))
-    Logger.info("state: " <> inspect(state))
-
     if msg.text do
-      Logger.info inspect(robot)
-      Logger.info msg.text
       :ok = Hedwig.Robot.handle_in(robot, msg)
     end
     {:noreply, state}
@@ -102,7 +101,6 @@ defmodule Hedwig.Adapters.Flowdock do
   end
 
   defp flowdock_message(%Hedwig.Message{} = msg, overrides \\ %{}) do
-    IO.inspect msg
     defaults = Map.merge(%{flow: msg.room, content: msg.text, event: msg.type}, overrides)
     if msg.private.thread_id do
       Map.merge(%{thread_id: msg.private[:thread_id]}, defaults)
