@@ -25,7 +25,7 @@ defmodule Hedwig.Adapters.Flowdock do
     {:ok, s_conn} = SC.start_link(Keyword.put(opts, :flows, flows))
     users = GenServer.call(r_conn, :users)
     reduced_users = reduce(users, %{})
-    user = Enum.find(users, fn u -> String.downcase(u["nick"]) == String.downcase(opts[:name]) end)
+    user = Enum.find(users, fn u -> String.downcase(u["nick"]) == String.downcase(opts[:name]) end) |> to_string
 
     {:ok, %State{conn: s_conn, rest_conn: r_conn, opts: opts, robot: robot, users: reduced_users, user_id: user["id"]}}
   end
@@ -56,6 +56,9 @@ defmodule Hedwig.Adapters.Flowdock do
     {:noreply, state}
   end
 
+  def handle_cast({:message, _content, _flow_id, user, _thread_id}, %{user_id: user} = state) do
+    {:noreply, state}
+  end
   def handle_cast({:message, content, flow_id, user, thread_id}, %{robot: robot, users: users, user_id: user_id} = state) do
     msg = %Hedwig.Message{
       ref: make_ref(),
@@ -71,9 +74,6 @@ defmodule Hedwig.Adapters.Flowdock do
         name: users[user]["nick"]
       }
     }
-
-    Logger.info("user: #{inspect(user)}")
-    Logger.info("user_id: #{inspect(user_id)}")
 
     if msg.text do
       :ok = Hedwig.Robot.handle_in(robot, msg)
