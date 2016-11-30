@@ -72,7 +72,8 @@ defmodule Hedwig.Adapters.Flowdock do
     }
 
     if msg.text do
-      Hedwig.Robot.handle_in(robot, msg)
+      Logger.info msg.text
+      :ok = Hedwig.Robot.handle_in(robot, msg)
     end
     {:noreply, state}
   end
@@ -86,16 +87,17 @@ defmodule Hedwig.Adapters.Flowdock do
   end
 
   def handle_info(:connection_ready, %{robot: robot} = state) do
-    Hedwig.Robot.handle_connect(robot)
+    :ok = Hedwig.Robot.handle_connect(robot)
     {:noreply, state}
   end
 
   def handle_info(msg, %{robot: robot} = state) do
-    Hedwig.Robot.handle_in(robot, msg)
+    :ok = Hedwig.Robot.handle_in(robot, msg)
     {:noreply, state}
   end
 
   defp flowdock_message(%Hedwig.Message{} = msg, overrides \\ %{}) do
+    IO.inspect msg
     defaults = Map.merge(%{flow: msg.room, content: msg.text, event: msg.type}, overrides)
     if msg.private.thread_id do
       Map.merge(%{thread_id: msg.private[:thread_id]}, defaults)
