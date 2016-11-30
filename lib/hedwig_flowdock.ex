@@ -72,7 +72,8 @@ defmodule Hedwig.Adapters.Flowdock do
       }
     }
 
-    Logger.info(inspect(msg))
+    Logger.info("msg: " <> inspect(msg))
+    Logger.info("state: " <> inspect(state))
 
     if msg.text do
       Logger.info inspect(robot)
