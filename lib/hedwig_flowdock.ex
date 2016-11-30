@@ -57,7 +57,7 @@ defmodule Hedwig.Adapters.Flowdock do
   end
 
   # the bot should ignore its own messages
-  def handle_cast({:message, _content, _flow_id, user_id, _thread_id}, %{user_id: ^user_id} = state) do
+  def handle_cast({:message, _content, _flow_id, user_id, _thread_id}, %{user_id: user_id} = state) do
     {:noreply, state}
   end
   def handle_cast({:message, content, flow_id, user, thread_id}, %{robot: robot, users: users} = state) do
