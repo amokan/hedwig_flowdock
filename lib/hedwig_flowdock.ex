@@ -72,7 +72,7 @@ defmodule Hedwig.Adapters.Flowdock do
     }
 
     if msg.text do
-      Hedwig.Robot.handle_message(robot, msg)
+      Hedwig.Robot.handle_in(robot, msg)
     end
     {:noreply, state}
   end
