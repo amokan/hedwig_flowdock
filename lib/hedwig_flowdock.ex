@@ -71,7 +71,10 @@ defmodule Hedwig.Adapters.Flowdock do
       }
     }
 
+    Logger.info(inspect(msg))
+
     if msg.text do
+      Logger.info inspect(robot)
       Logger.info msg.text
       :ok = Hedwig.Robot.handle_in(robot, msg)
     end
